@@ -55,6 +55,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: stryker-report
-          path: ./server/Testing/StrykerOutput
+          path: ./server/StrykerOutput
           if-no-files-found: 'warn'
     
