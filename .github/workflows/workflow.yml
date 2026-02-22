@@ -39,7 +39,6 @@ jobs:
             -reporttypes:Html
 
       - name: Run Mutation Tests
-        working-directory: server/Tests
         run: |
           dotnet stryker --break-at 80 --reporter html
 
