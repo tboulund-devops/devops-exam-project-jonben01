@@ -20,7 +20,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Install required tools
         run: |
@@ -39,6 +39,7 @@ jobs:
             -reporttypes:Html
 
       - name: Run Mutation Tests
+        working-directory: ./server/Tests
         run: |
           dotnet stryker --break-at 80 --reporter html
 
@@ -47,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage-report
+          path: ./server/coverage-report
           if-no-files-found: 'warn'
 
       - name: Collect Stryker Report
@@ -55,6 +56,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: stryker-report
-          path: StrykerOutput
+          path: ./server/Tests/StrykerOutput
           if-no-files-found: 'warn'
     
