@@ -38,14 +38,14 @@
 *Winter vacation - nothing planned.*
 
 ### Week 8
+**Feature 1:** [Events can be read, updated and deleted]
+
+**Feature 2:** [Events support colour coding (enum)]
+
+### Week 9
 **Feature 1:** [Users can log in and stay logged in for a period]
 
 **Feature 2:** [Users can only access their own calendar data]
-
-### Week 9
-**Feature 1:** [...]
-
-**Feature 2:** [...]
 
 ### Week 10
 **Feature 1:** [...]
