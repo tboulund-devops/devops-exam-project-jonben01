@@ -3,6 +3,7 @@
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   integration:
