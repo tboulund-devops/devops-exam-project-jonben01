@@ -5,7 +5,10 @@
     "ignore-mutations": [],
     "mutate": [
       "!**/Migrations/**",
-      "!DataAccess/MyDbContext.cs"
+      "!DataAccess/MyDbContext.cs",
+      "!**/DTO/**",
+      "!**/Controllers/**",
+      "!**/Program.cs"
     ]
   }
 }
