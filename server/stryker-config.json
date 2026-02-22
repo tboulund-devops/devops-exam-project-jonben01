@@ -1,0 +1,12 @@
+﻿{
+  "stryker-config": {
+    "project": "Api/Api.csproj",
+    "test-projects": ["Testing/Testing.csproj"],
+    "ignore-mutations": [],
+    "mutate": [
+      "Api/**/*.cs",
+      "!**/Migrations/**",
+      "!DataAccess/MyDbContext.cs"
+    ]
+  }
+}

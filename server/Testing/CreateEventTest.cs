@@ -8,7 +8,7 @@ namespace Testing;
 public class CreateEventTest : IDisposable
 {
     private readonly MyDbContext _dbContext;
-    private readonly CreateEventService _createEventService;
+    private readonly EventService _eventService;
     
     private const string ValidTimezone = "Europe/Copenhagen";
     private static readonly Guid UserId = Guid.NewGuid();
@@ -24,7 +24,7 @@ public class CreateEventTest : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         _dbContext = new MyDbContext(options);
-        _createEventService = new CreateEventService(_dbContext);
+        _eventService = new EventService(_dbContext);
     }
     
     [Fact]
@@ -36,7 +36,7 @@ public class CreateEventTest : IDisposable
         var before = DateTimeOffset.UtcNow;
 
         //Act
-        var result = await _createEventService.CreateEvent(UserId, new CreateEventRequestDto
+        var result = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
         {
             IsAllDay = false,
             StartUtc = start,
@@ -68,7 +68,7 @@ public class CreateEventTest : IDisposable
         var end = new DateOnly(2025, 3, 3);
 
         //Act
-        var result = await _createEventService.CreateEvent(UserId, new CreateEventRequestDto
+        var result = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
         {
             IsAllDay  = true,
             StartDate = start,
@@ -96,7 +96,7 @@ public class CreateEventTest : IDisposable
         var date = new DateOnly(2025, 3, 1);
 
         //Act
-        var result = await _createEventService.CreateEvent(UserId, new CreateEventRequestDto
+        var result = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
         {
             IsAllDay  = true,
             StartDate = date,

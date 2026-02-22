@@ -24,7 +24,7 @@ public static partial class Program
         
         // todo AddIdentity
         
-        services.AddScoped<IEventService, CreateEventService>();
+        services.AddScoped<IEventService, EventService>();
         
         // todo JWT bearer + key + settings
 

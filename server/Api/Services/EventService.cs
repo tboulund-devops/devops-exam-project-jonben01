@@ -5,12 +5,12 @@ using DataAccess.Models;
 
 namespace Api.Services;
 
-public class CreateEventService : IEventService
+public class EventService : IEventService
 {
 
     private readonly MyDbContext _context;
     
-    public CreateEventService(MyDbContext context)
+    public EventService(MyDbContext context)
     {
         _context = context;
     }
