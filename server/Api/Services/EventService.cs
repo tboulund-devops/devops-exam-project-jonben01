@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Api.DTO;
+using Api.DTO.util;
 using DataAccess;
 using DataAccess.Models;
 
@@ -20,35 +21,7 @@ public class EventService : IEventService
         CreateEventRequestDto createEventRequestDto, 
         CancellationToken ct)
     {
-        
-        //TODO move validation to helper methods -- will be nice for when event types gets added, to avoid bloat.
-        
-        if (createEventRequestDto.IsAllDay)
-        {
-            if (createEventRequestDto.StartDate is null || createEventRequestDto.EndDate is null)
-            {
-                throw new ValidationException("Start date and end date are required for all day events");
-            }
-            
-            if (createEventRequestDto.StartDate > createEventRequestDto.EndDate)
-            {
-                throw new ValidationException("Start date cannot be after end date.");
-            }
-        }
-        else
-        {
-            //maybe only keep start utc, and automatically set end utc to end of day
-            if (createEventRequestDto.StartUtc is null || createEventRequestDto.EndUtc is null)
-                throw new ValidationException("Start time cannot be null.");
-            
-            if (createEventRequestDto.StartUtc >= createEventRequestDto.EndUtc)
-                throw new ValidationException("Start time cannot be after end time.");
-            
-            if (!IsValidTimezone(createEventRequestDto.TimeZoneId))
-                throw new ValidationException("Time zone is not valid.");
-            
-        }
-        
+        ValidateCreateEventRequest(createEventRequestDto);
         
         var now =  DateTimeOffset.UtcNow;
         var evt = new Event
@@ -64,27 +37,46 @@ public class EventService : IEventService
             TimeZoneId = createEventRequestDto.TimeZoneId,
             CreatedAt = now,
             UpdatedAt =  now,
-            
         };
         
         _context.Events.Add(evt);
         await _context.SaveChangesAsync(ct);
-        return new EventDto
-        {
-            Id = evt.Id,
-            Title = evt.Title,
-            IsAllDay = evt.IsAllDay,
-            StartUtc = evt.StartUtc,
-            EndUtc = evt.EndUtc,
-            StartDate = evt.StartDate,
-            EndDate = evt.EndDate,
-            TimeZoneId = evt.TimeZoneId,
-            CreatedAt = evt.CreatedAt,
-            UpdatedAt = evt.UpdatedAt,  
-        };
-    
+        return evt.ToDto();
     }
-    
+
+    private static void ValidateCreateEventRequest(CreateEventRequestDto createEventRequestDto)
+    {
+        if (createEventRequestDto.IsAllDay)
+            ValidateAllDayEvent(createEventRequestDto);
+        else
+            ValidateTimedEvent(createEventRequestDto);
+    }
+
+    private static void ValidateTimedEvent(CreateEventRequestDto createEventRequestDto)
+    {
+        if (createEventRequestDto.StartUtc is null || createEventRequestDto.EndUtc is null)
+            throw new ValidationException("Start time cannot be null.");
+            
+        if (createEventRequestDto.StartUtc >= createEventRequestDto.EndUtc)
+            throw new ValidationException("Start time cannot be after end time.");
+            
+        if (!IsValidTimezone(createEventRequestDto.TimeZoneId))
+            throw new ValidationException("Time zone is not valid.");
+    }
+
+    private static void ValidateAllDayEvent(CreateEventRequestDto createEventRequestDto)
+    {
+        if (createEventRequestDto.StartDate is null || createEventRequestDto.EndDate is null)
+        {
+            throw new ValidationException("Start date and end date are required for all day events");
+        }
+            
+        if (createEventRequestDto.StartDate > createEventRequestDto.EndDate)
+        {
+            throw new ValidationException("Start date cannot be after end date.");
+        }
+    }
+
     private static bool IsValidTimezone(string? timezoneId) =>
         timezoneId is not null && TimeZoneInfo.TryFindSystemTimeZoneById(timezoneId, out _);
     
