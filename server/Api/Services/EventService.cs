@@ -40,14 +40,13 @@ public class EventService : IEventService
             //maybe only keep start utc, and automatically set end utc to end of day
             if (createEventRequestDto.StartUtc is null || createEventRequestDto.EndUtc is null)
                 throw new ValidationException("Start time cannot be null.");
-
-            if (createEventRequestDto.StartUtc > createEventRequestDto.EndUtc)
+            
+            if (createEventRequestDto.StartUtc >= createEventRequestDto.EndUtc)
                 throw new ValidationException("Start time cannot be after end time.");
-
+            
             if (!IsValidTimezone(createEventRequestDto.TimeZoneId))
-            {
                 throw new ValidationException("Time zone is not valid.");
-            }
+            
         }
         
         

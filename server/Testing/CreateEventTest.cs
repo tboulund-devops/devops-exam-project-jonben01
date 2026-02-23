@@ -1,4 +1,5 @@
-﻿using Api.DTO;
+﻿using System.ComponentModel.DataAnnotations;
+using Api.DTO;
 using Api.Services;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +89,8 @@ public class CreateEventTest : IDisposable
         Assert.Equal(UserId, saved.OwnerId);
     }
     
-    //Test is to kill >= to > mutants
+    //The following Tests mostly focus on killing >= to > or similar mutants.
+    
     [Fact]
     public async Task CreateEvent_AllDay_StartEqualsEnd_Succeeds()
     {
@@ -108,5 +110,75 @@ public class CreateEventTest : IDisposable
         Assert.Equal(date, result.EndDate);
     }
     
+    [Theory]
+    [InlineData(true,  false)]
+    [InlineData(false, true)]
+    [InlineData(true,  true)]
+    public async Task CreateEvent_TimedEvent_NullStartOrEnd_Throws(bool nullStart, bool nullEnd)
+    {
+        await Assert.ThrowsAsync<ValidationException>(() => _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = nullStart ? null : DateTimeOffset.UtcNow,
+            EndUtc = nullEnd ? null : DateTimeOffset.UtcNow.AddHours(1),
+            TimeZoneId = ValidTimezone,
+        }, CancellationToken.None));
+    }
+    
+    
+    [Theory]
+    [InlineData(3, 2)]  
+    [InlineData(0, 0)]  
+    public async Task CreateEvent_TimedEvent_StartNotBeforeEnd_Throws(int startHours, int endHours)
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        await Assert.ThrowsAsync<ValidationException>(() => _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = now.AddHours(startHours),
+            EndUtc = now.AddHours(endHours),
+            TimeZoneId = ValidTimezone,
+        }, CancellationToken.None));
+    }
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData("Not/ATimezone")]
+    public async Task CreateEvent_TimedEvent_InvalidTimezone_Throws(string? timezoneId)
+    {
+        await Assert.ThrowsAsync<ValidationException>(() => _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = DateTimeOffset.UtcNow,
+            EndUtc = DateTimeOffset.UtcNow.AddHours(1),
+            TimeZoneId = timezoneId,
+        }, CancellationToken.None));
+    }
+    
+    [Theory]
+    [InlineData(true,  false)]
+    [InlineData(false, true)]
+    [InlineData(true,  true)]
+    public async Task CreateEvent_AllDay_NullStartOrEndDate_Throws(bool nullStart, bool nullEnd)
+    {
+        await Assert.ThrowsAsync<ValidationException>(() => _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay  = true,
+            StartDate = nullStart ? null : new DateOnly(2025, 3, 1),
+            EndDate = nullEnd ? null : new DateOnly(2025, 3, 1),
+        }, CancellationToken.None));
+    }
+    
+    [Fact]
+    public async Task CreateEvent_AllDay_StartAfterEnd_Throws()
+    {
+        await Assert.ThrowsAsync<ValidationException>(() => _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay  = true,
+            StartDate = new DateOnly(2025, 3, 5),
+            EndDate   = new DateOnly(2025, 3, 1),
+        }, CancellationToken.None));
+    }
     
 }
