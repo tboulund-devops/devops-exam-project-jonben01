@@ -21,22 +21,44 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
-
+          
       - name: Install required tools
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
           dotnet tool install -g dotnet-stryker
+          dotnet tool install -g dotnet-sonarscanner
+          
+      - name: Start static code analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          dotnet sonarscanner begin \
+            /k:"${{ secrets.SONAR_PROJECT_KEY }}" \
+            /d:sonar.host.url="${SONAR_HOST_URL}" \
+            /d:sonar.token="${SONAR_TOKEN}" \
+            /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
+            /d:sonar.qualitygate.wait=true \
+            /d:sonar.qualitygate.timeout=300
+
+      - name: Build
+        run: dotnet build
 
       - name: Run unit tests
         run: |
-          dotnet test --configuration Release --collect:"XPlat Code Coverage"
+          dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Generate report
         run: |
           reportgenerator \
             -reports:"**/TestResults/*/coverage.cobertura.xml" \
             -targetdir:"coverage-report" \
-            -reporttypes:Html
+            -reporttypes:SonarQube
+          
+      - name: End static code analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
       - name: Run Mutation Tests
         run: |
