@@ -42,11 +42,11 @@ jobs:
             /d:sonar.qualitygate.timeout=300
 
       - name: Build
-        run: dotnet build
+        run: dotnet build --configuration Release
 
       - name: Run unit tests
         run: |
-          dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+          dotnet test --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Generate report
         run: |
