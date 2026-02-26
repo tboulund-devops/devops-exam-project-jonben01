@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Api;
 using Api.DTO;
 using Api.Services;
 using DataAccess;
+using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Testing;
@@ -180,6 +181,61 @@ public class CreateEventTest : IDisposable
             StartDate = new DateOnly(2025, 3, 5),
             EndDate   = new DateOnly(2025, 3, 1),
         }, CancellationToken.None));
+    }
+    
+    [Fact]
+    public async Task CreateEvent_WithColor_UsesProvidedColor()
+    {
+        var result = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = DateTimeOffset.UtcNow,
+            EndUtc = DateTimeOffset.UtcNow.AddHours(1),
+            TimeZoneId = ValidTimezone,
+            Color = EventColor.Red,
+        }, CancellationToken.None);
+
+        Assert.Equal(EventColor.Red, result.Color);
+    }
+    
+    [Fact]
+    public async Task CreateEvent_WithoutColor_AssignsColor()
+    {
+        var result = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = DateTimeOffset.UtcNow,
+            EndUtc = DateTimeOffset.UtcNow.AddHours(1),
+            TimeZoneId = ValidTimezone,
+            Color = null,
+        }, CancellationToken.None);
+        
+        Assert.True(Enum.IsDefined(typeof(EventColor), result.Color));
+    }
+    
+    [Fact]
+    public async Task CreateEvent_TwoEventsWithDifferentColors_RetainDistinctColors()
+    {
+        var r1 = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = DateTimeOffset.UtcNow,
+            EndUtc = DateTimeOffset.UtcNow.AddHours(1),
+            TimeZoneId = ValidTimezone,
+            Color = EventColor.Red,
+        }, CancellationToken.None);
+
+        var r2 = await _eventService.CreateEvent(UserId, new CreateEventRequestDto
+        {
+            IsAllDay = false,
+            StartUtc = DateTimeOffset.UtcNow,
+            EndUtc = DateTimeOffset.UtcNow.AddHours(1),
+            TimeZoneId = ValidTimezone,
+            Color = EventColor.Blue,
+        }, CancellationToken.None);
+
+        Assert.Equal(EventColor.Red, r1.Color);
+        Assert.Equal(EventColor.Blue, r2.Color);
     }
     
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Models;
 
 namespace Api.DTO;
 
@@ -12,6 +13,8 @@ public record EventDto
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public string Title { get; set; } = "";
+    
+    public EventColor Color { get; set; }
     
     public bool IsAllDay { get; set; } = false;
     public DateOnly? StartDate { get; set; }

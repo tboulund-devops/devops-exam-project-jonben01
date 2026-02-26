@@ -1,5 +1,6 @@
 
 
+using Api;
 using Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
+Configure(app);
 
 await app.RunAsync();
 
@@ -30,11 +32,11 @@ public static partial class Program
 
         services.AddControllers();
         services.AddOpenApiDocument();
-        
-        //global exception handler maybe + services.AddProblemDetails + AddExceptionHandler
-        
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
+
         // todo CORS
-        
+
     }
 
     public static void Configure(WebApplication app)
@@ -43,6 +45,7 @@ public static partial class Program
         app.UseRouting();
         //cors
         //use auth and authz
+        app.UseExceptionHandler();
 
         app.MapControllers();
     }

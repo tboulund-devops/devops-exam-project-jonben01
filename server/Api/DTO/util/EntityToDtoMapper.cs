@@ -18,6 +18,7 @@ public static class EntityToDtoMapper
             TimeZoneId = evt.TimeZoneId,
             CreatedAt = evt.CreatedAt,
             UpdatedAt = evt.UpdatedAt,  
+            Color = evt.Color,
         };
     }
     

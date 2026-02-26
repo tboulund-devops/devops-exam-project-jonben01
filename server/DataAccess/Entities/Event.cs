@@ -30,12 +30,13 @@ public class Event
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     
+    public EventColor Color { get; set; } 
+    
     /*
      * Could add
      * 
      * Owner entity,
      * Reminder time,
-     * Color-coding,
      * Notes/Description
      */
 }

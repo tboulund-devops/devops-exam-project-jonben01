@@ -38,6 +38,7 @@ public class EventService : IEventService
             TimeZoneId = createEventRequestDto.TimeZoneId,
             CreatedAt = now,
             UpdatedAt =  now,
+            Color = createEventRequestDto.Color ?? GetRandomColor(),
         };
         
         _context.Events.Add(evt);
@@ -67,6 +68,12 @@ public class EventService : IEventService
             .ToListAsync(ct);
 
         return events.Select(e => e.ToDto()).ToList();
+    }
+
+    private static EventColor GetRandomColor()
+    {
+        var values = Enum.GetValues<EventColor>();
+        return values[Random.Shared.Next(values.Length)];
     }
 
     private static void ValidateCreateEventRequest(CreateEventRequestDto createEventRequestDto)

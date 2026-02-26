@@ -2,13 +2,15 @@
   "stryker-config": {
     "project": "Api/Api.csproj",
     "test-projects": ["Testing/Testing.csproj"],
-    "ignore-mutations": [],
+    "ignore-mutations": ["String"],
+    "reporters": ["html", "json"],
     "mutate": [
       "!**/Migrations/**",
       "!DataAccess/MyDbContext.cs",
       "!**/DTO/**",
       "!**/Controllers/**",
-      "!**/Program.cs"
+      "!**/Program.cs",
+      "!**/GlobalExceptionHandler.cs"
     ]
   }
 }

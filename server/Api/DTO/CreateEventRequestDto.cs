@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Models;
 using Newtonsoft.Json;
 
 namespace Api.DTO;
@@ -16,6 +17,8 @@ public record CreateEventRequestDto
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public string? TimeZoneId { get; set; }
+    
+    public EventColor? Color { get; set; }
     
     
 }
